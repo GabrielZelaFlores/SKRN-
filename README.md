@@ -20,7 +20,9 @@ El lenguaje se llama **SKRN**.
 **SKRN** un lenguaje de programación diseñado especialmente para facilitar el aprendizaje de conceptos fundamentales en programación. Lo que distingue a SKRN es su uso innovador de palabras clave en español escritas al revés, lo que ayuda a los principiantes a relacionar fácilmente los comandos con su significado original.
 
 🔹 Inspirado en Python y C para combinar facilidad de uso con control eficiente de recursos.
+
 🔹 Estructura clara y modular que favorece la reutilización del código.
+
 🔹 Uso de palabras clave en español invertidas, lo que facilita su reconocimiento.
 
 ---
