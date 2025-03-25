@@ -17,24 +17,44 @@
 El lenguaje se llama **SKRN**.
 
 ## 🎯 Justificación y descripción del lenguaje
-**SKRN** es un lenguaje de programación con un enfoque **didáctico**, diseñado para facilitar el aprendizaje de estructuras de control y funciones. Su principal característica es el **uso de palabras clave en español y su transliteración al ruso**, lo que lo hace único y fácil de entender.
+**SKRN** un lenguaje de programación diseñado especialmente para facilitar el aprendizaje de conceptos fundamentales en programación. Lo que distingue a SKRN es su uso innovador de palabras clave en español escritas al revés, lo que ayuda a los principiantes a relacionar fácilmente los comandos con su significado original.
 
-🔹 Inspirado en **Python y C**.
-🔹 Estructura clara y modular.
-🔹 Sintaxis intuitiva, ideal para principiantes.
-🔹 Herramientas suficientes para desarrollar lógica estructurada.
+🔹 Inspirado en Python y C para combinar facilidad de uso con control eficiente de recursos.
+🔹 Estructura clara y modular que favorece la reutilización del código.
+🔹 Uso de palabras clave en español invertidas, lo que facilita su reconocimiento.
 
 ---
 
 ## 📌 Estructura general del lenguaje
-**SKRN** utiliza una sintaxis sencilla basada en palabras clave fácilmente reconocibles. Permite definir funciones, usar condicionales y manejar bucles sin mayor complejidad, favoreciendo un código limpio y legible.
+El lenguaje **SKRN** se basa en una sintaxis simplificada que mantiene las estructuras fundamentales de la programación imperativa.
 
-### ✨ Principales características:
-✔ Uso de palabras clave en **español** y **ruso transliterado**.
-✔ **Sintaxis clara** y fácil de leer.
-✔ Soporte para **estructuras de control** (`if`, `while`, `do-while`).
-✔ Capacidad para **definir funciones** y usar **recursividad**.
-✔ **Inferencia de tipos implícita**, simplificando su uso.
+Ejemplo de código en SKRN:
+
+```skrn
+fi (x > 0) {
+    nruter x;
+} esle {
+    nruter -x;
+}
+```
+
+📌 En este código, el condicional fi evalúa si x es mayor que 0. Si se cumple, se retorna x; de lo contrario (esle), se retorna -x.
+
+Las estructuras de control básicas incluyen:
+✔ Condicionales: fi, esle
+✔ Bucles: rof, elihw, od-elihw
+✔ Definición de funciones con nruter
+✔ Manejo de estructuras y clases con ssalc y tcurts
+
+---
+
+✨ Principales características
+✔ Uso de palabras clave en español invertidas para facilitar la asociación con conceptos conocidos.
+✔ Soporte para estructuras de control (fi, esle, rof, elihw).
+✔ Capacidad de definir funciones y usar recursividad mediante nruter.
+✔ Inferencia de tipos implícita, reduciendo la necesidad de declaraciones manuales.
+✔ Operadores y sintaxis similares a C y Python, lo que permite una transición sencilla a otros lenguajes.
+✔ Manejo de clases y estructuras, facilitando la programación orientada a objetos.
 
 ---
 
