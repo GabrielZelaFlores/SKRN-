@@ -59,7 +59,7 @@ El lenguaje se llama **SKRN**.
 | **LESS_EQUAL**         | `<=`        | Operador de menor o igual que.                      |
 | **GREATER_EQUAL**      | `>=`        | Operador de mayor o igual que.                      |
 | **LOGICAL_AND**        | `&&`        | Operador lógico AND.                                |
-| **LOGICAL_OR**         | `||`        | Operador lógico OR.                                 |
+| **LOGICAL_OR**         | `ll`        | Operador lógico OR.                                 |
 | **LOGICAL_NOT**        | `!`         | Operador lógico NOT (negación).                     |
 | **PLUS_ASSIGN**        | `+=`        | Operador de asignación con suma.                    |
 | **MINUS_ASSIGN**       | `-=`        | Operador de asignación con resta.                   |
