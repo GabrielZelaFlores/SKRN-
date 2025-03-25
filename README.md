@@ -107,41 +107,41 @@ El lenguaje se llama **SKRN**.
 ## 🔥 Ejemplos en Lenguaje SKRN
 ### 🖥️ (1) Hola Mundo 🌎
 ```skrn
-funktisiya main() {
-    vyzvat "Hola, Mundo!"
-    vozvrat
+tni niam() {
+    tuoc << "Hola, Mundo!"
+    nruter
 }
 ```
 
 ### 🔄 (2) Bucles anidados 🔄
 ```skrn
-funktisiya main() {
-    i = 0
-    poka (i < 5) delat {
-        j = 0
-        poka (j < 5) delat {
-            vyzvat i + " " + j
+tni niam() {
+    tni i = 0
+    elihw (i < 5) od {
+        tni j = 0
+        elihw (j < 5) od {
+            tuoc << i << " " << j << endl
             j = j + 1
         }
         i = i + 1
     }
-    vozvrat
+    nruter 0
 }
 ```
 
 ### 🧮 (3) Recursividad (Factorial) 🧮
 ```skrn
-funktisiya factorial(n) {
-    esli (n == 0) togda {
-        vozvrat 1
+diov factorial(tni n) {
+    fi (n == 0) {
+        nruter 1
     }
-    vozvrat n * factorial(n - 1)
+    nruter n * factorial(n - 1)
 }
 
-funktisiya main() {
-    rezultat = factorial(5)
-    vyzvat rezultat
-    vozvrat
+tni niam() {
+    tni resultado = factorial(5)
+    tuoc << resultado << endl
+    nruter 0
 }
 ```
 
