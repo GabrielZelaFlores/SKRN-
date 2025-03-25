@@ -1,5 +1,3 @@
-pip install ply
-
 LexToken(DIVIDE,'/',2,1)
 LexToken(DIVIDE,'/',2,2)
 LexToken(LPAREN,'(',2,5)
