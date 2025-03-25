@@ -135,15 +135,22 @@ while True:
 Ejecutando el código anterior, se obtiene la siguiente salida de tokens:
 
 \begin{verbatim}
-Token(type='type_int', lexeme='tni', line=1, column=1)
-Token(type='ID', lexeme='niam', line=1, column=5)
-Token(type='LPAREN', lexeme='(', line=1, column=9)
-Token(type='RPAREN', lexeme=')', line=1, column=10)
-Token(type='LBRACE', lexeme='{', line=2, column=1)
-Token(type='ID', lexeme='tuoc', line=3, column=5)
-Token(type='STRING', lexeme='"Hola, Mundo!"', line=3, column=10)
-Token(type='RETURN', lexeme='nruter', line=4, column=5)
-Token(type='RBRACE', lexeme='}', line=5, column=1)
+LexToken(DIVIDE,'/',2,1)
+LexToken(DIVIDE,'/',2,2)
+LexToken(LPAREN,'(',2,5)
+LexToken(INTEGER,1,2,6)
+LexToken(RPAREN,')',2,7)
+LexToken(ID,'Hola',2,9)
+LexToken(ID,'Mundo',2,14)
+LexToken(type_int,'tni',3,21)
+LexToken(ID,'niam',3,25)
+LexToken(LPAREN,'(',3,29)
+LexToken(RPAREN,')',3,30)
+LexToken(LBRACE,'{',3,32)
+LexToken(ID,'tuoc',4,38)
+LexToken(LESS,'<',4,43)
+LexToken(LESS,'<',4,44)
+LexToken(STRING,'"Hola, Mundo!"',4,46)
 \end{verbatim}
 
 \section{Conclusión}
