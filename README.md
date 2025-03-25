@@ -22,7 +22,6 @@
 
 ### 🔹 **Características Claves**  
 ✔ Inspirado en Python y C, combinando facilidad de uso con eficiencia en el control de recursos.  
-✔ Sintaxis clara y modular, fomentando la reutilización del código.  
 ✔ Uso de palabras clave en español invertidas para mejorar la comprensión.  
 ✔ Soporte para estructuras de control, funciones y programación orientada a objetos.  
 ✔ Inferencia de tipos implícita para simplificar el desarrollo.  
@@ -156,7 +155,7 @@ tni niam() {
 ---
 
 ## 🚀 **Conclusión**  
-**SKRN** es un lenguaje accesible, didáctico y potente. Su estructura clara y su innovador uso de palabras clave invertidas lo convierten en una excelente opción para principiantes que desean aprender programación de manera intuitiva y eficiente.  
+**SKRN** Su estructura clara y su innovador uso de palabras clave invertidas lo convierten en una excelente opción para principiantes que desean aprender programación de manera intuitiva y eficiente.  
 
 🔹 **Fácil de aprender** gracias a su relación con palabras clave en español.  
 🔹 **Potente y flexible**, permitiendo desde estructuras básicas hasta programación orientada a objetos.  
