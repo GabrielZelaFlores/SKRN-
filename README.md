@@ -69,6 +69,14 @@ El lenguaje se llama **SKRN**.
 | **TERNARY_C**          | `:`         | Operador ternario (condición - dos puntos).         |
 | **MEMBER_ACCESS**      | `.`         | Operador de acceso a miembros.                      |
 | **POINTER_ACCESS**     | `->`        | Operador de acceso a miembros mediante puntero.     |
+| **LPAREN**    | `\(`         | Paréntesis izquierdo.                      |
+| **RPAREN**    | `\)`         | Paréntesis derecho.                       |
+| **LBRACE**    | `{`          | Llave izquierda.                         |
+| **RBRACE**    | `}`          | Llave derecha.                           |
+| **LBRACKET**  | `\[`         | Corchete izquierdo.                      |
+| **RBRACKET**  | `\]`         | Corchete derecho.                        |
+| **SEMICOLON** | `;`          | Fin de instrucción.                      |
+| **COMMA**     | `,`          | Separador de elementos.                  |
 | **type_int**       | `tni`         | Tipo de dato entero.                                    |
 | **type_float**     | `taolf`       | Número de punto flotante de precisión simple.            |
 | **type_double**    | `elbuod`      | Número de punto flotante de doble precisión.             |
