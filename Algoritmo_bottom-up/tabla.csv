@@ -1,0 +1,12 @@
+NonTerminal,Terminal,Production
+E,int,T X
+E,(,T X
+X,+,+ E
+X,), 
+X,$, 
+T,int,int Y
+T,(,( E )
+Y,*,* T
+Y,+,
+Y,),
+Y,$, 
