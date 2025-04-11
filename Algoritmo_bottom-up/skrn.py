@@ -94,8 +94,50 @@ def predictive_parser(input_tokens, csv_file="parsing_table.csv"):
         else:
             print(f"ERROR: símbolo desconocido {top}")
             break
+def procesar_tabla_analisis(archivo_entrada, archivo_salida):
+    # Leer el archivo CSV de entrada
+    df = pd.read_csv(archivo_entrada)
+    
+    # Extraer la lista de terminales (primera fila, excluyendo "Non-Terminal")
+    terminales = df.columns[1:].tolist()
+    
+    # Lista para almacenar las producciones resultantes
+    producciones = []
+    
+    # Iterar sobre cada fila (no terminales)
+    for _, fila in df.iterrows():
+        no_terminal = fila['Non-Terminal']
+        
+        # Iterar sobre cada terminal
+        for terminal in terminales:
+            produccion = fila[terminal]
+            
+            # Saltar celdas vacías o NaN
+            if pd.isna(produccion) or produccion == '':
+                continue
+                
+            # Reemplazar ε con cadena vacía
+            if produccion == 'ε':
+                produccion = ''
+                
+            # Agregar a la lista de producciones
+            producciones.append({
+                'NonTerminal': no_terminal,
+                'Terminal': terminal,
+                'Production': produccion
+            })
+    
+    # Crear DataFrame con las producciones
+    df_salida = pd.DataFrame(producciones)
+    
+    # Guardar en archivo CSV
+    df_salida.to_csv(archivo_salida, index=False)
+    print(f"Archivo generado exitosamente: {archivo_salida}")
 
 # Ejecutar el analizador con esta entrada
 if __name__ == "__main__":
+    archivo_entrada = 'tabla.csv'
+    archivo_salida = 'producciones.csv'
+    procesar_tabla_analisis(archivo_entrada, archivo_salida)
     input_string = ['int', '+', 'int']
-    predictive_parser(input_string, csv_file="tabla.csv")
+    predictive_parser(input_string, csv_file="producciones.csv")
