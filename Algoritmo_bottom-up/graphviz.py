@@ -24,7 +24,7 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
     input_tokens = input_tokens.copy()
     input_tokens.append('$')
     pointer = 0
-    root = stack[-1][0]  
+    root = stack[-1][0]  # Raíz del árbol
 
     print(f"{'Pila':<20} {'Entrada':<20} {'Acción'}")
     print("-" * 60)
@@ -37,7 +37,7 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
         if top == current_input == '$':
             print("ACEPTAR")
             break
-        elif top in ['int', '+', '*', '(', ')', '$']:
+        elif top in ['int', '+', '*', '(', ')', '$','ε']:
             if top == current_input:
                 print("terminal")
                 pointer += 1
@@ -61,7 +61,6 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
 
     return root
 
-
 def procesar_tabla_analisis(archivo_entrada, archivo_salida):
     df = pd.read_csv(archivo_entrada)
     terminales = df.columns[1:].tolist()
@@ -83,15 +82,43 @@ def procesar_tabla_analisis(archivo_entrada, archivo_salida):
     df_salida.to_csv(archivo_salida, index=False)
     print(f"Archivo generado exitosamente: {archivo_salida}")
 
-def imprimir_arbol(node, nivel=0):
-    print("  " * nivel + f"- {node.value}")
-    for child in node.children:
-        imprimir_arbol(child, nivel + 1)
-
+def generar_arbol_graphviz(node, filename="arbol_sintactico"):
+    """Genera un archivo DOT para visualizar el árbol con Graphviz"""
+    
+    # Contadores para nodos únicos
+    node_counter = 0
+    dot_lines = ["digraph G {"]
+    
+    def build_graph(node, parent_id=None):
+        nonlocal node_counter
+        current_id = node_counter
+        node_counter += 1
+        
+        # Añadir el nodo actual
+        dot_lines.append(f'  node{current_id} [label="{node.value}"];')
+        
+        # Conectar con el padre si existe
+        if parent_id is not None:
+            dot_lines.append(f'  node{parent_id} -> node{current_id};')
+        
+        # Procesar hijos recursivamente
+        for child in node.children:
+            build_graph(child, current_id)
+    
+    # Construir el grafo
+    build_graph(node)
+    dot_lines.append("}")
+    
+    # Escribir el archivo DOT
+    dot_filename = f"{filename}.dot"
+    with open(dot_filename, "w") as f:
+        f.write("\n".join(dot_lines))
+    
+    print(f"Archivo DOT generado: {dot_filename}")
 if __name__ == "__main__":
     archivo_entrada = 'tabla.csv'
     archivo_salida = 'producciones.csv'
     procesar_tabla_analisis(archivo_entrada, archivo_salida)
     input_string = ['int', '+', 'int']
     root = predictive_parser(input_string, csv_file=archivo_salida)
-    imprimir_arbol(root)
+    generar_arbol_graphviz(root)
