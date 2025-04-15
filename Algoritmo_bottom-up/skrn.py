@@ -94,4 +94,3 @@ if __name__ == "__main__":
     input_string = ['int', '+', '+', 'int']
     root = predictive_parser(input_string, csv_file=archivo_salida)
     imprimir_arbol(root)
-    guardar_recorridos(root, archivo="recorridos.csv")
