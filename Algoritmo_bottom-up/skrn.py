@@ -24,15 +24,15 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
     input_tokens = input_tokens.copy()
     input_tokens.append('$')
     pointer = 0
-    root = stack[-1][0]  # Raíz del árbol
+    root = stack[-1][0]  
 
     print(f"{'Pila':<20} {'Entrada':<20} {'Acción'}")
     print("-" * 60)
 
     while stack:
+        print(f"{' '.join(s for _, s in stack[::-1]):<20} {' '.join(input_tokens[pointer:]):<20}", end=" ")
         top_node, top = stack.pop()
         current_input = input_tokens[pointer]
-        print(f"{' '.join(s for _, s in stack[::-1]):<20} {' '.join(input_tokens[pointer:]):<20}", end=" ")
 
         if top == current_input == '$':
             print("ACEPTAR")
@@ -60,6 +60,7 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
             break
 
     return root
+
 
 def procesar_tabla_analisis(archivo_entrada, archivo_salida):
     df = pd.read_csv(archivo_entrada)
@@ -91,6 +92,6 @@ if __name__ == "__main__":
     archivo_entrada = 'tabla.csv'
     archivo_salida = 'producciones.csv'
     procesar_tabla_analisis(archivo_entrada, archivo_salida)
-    input_string = ['int', '+', '+', 'int']
+    input_string = ['int', '+', 'int']
     root = predictive_parser(input_string, csv_file=archivo_salida)
     imprimir_arbol(root)
