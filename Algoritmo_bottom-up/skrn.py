@@ -61,33 +61,6 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
 
     return root
 
-def inorder_traversal(node):
-    if not node.children:
-        return [node.value]
-    mid = len(node.children) // 2
-    result = []
-    for i, child in enumerate(node.children):
-        if i == mid:
-            result.append(node.value)
-        result.extend(inorder_traversal(child))
-    if mid == 0:
-        result.insert(0, node.value)
-    return result
-
-def postorder_traversal(node):
-    result = []
-    for child in node.children:
-        result.extend(postorder_traversal(child))
-    result.append(node.value)
-    return result
-
-def guardar_recorridos(root, archivo="recorridos.csv"):
-    inorden = inorder_traversal(root)
-    postorden = postorder_traversal(root)
-    df = pd.DataFrame({"inorden": inorden, "postorden": postorden})
-    df.to_csv(archivo, index=False)
-    print(f"Recorridos guardados en: {archivo}")
-
 def procesar_tabla_analisis(archivo_entrada, archivo_salida):
     df = pd.read_csv(archivo_entrada)
     terminales = df.columns[1:].tolist()
