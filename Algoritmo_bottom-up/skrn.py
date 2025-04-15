@@ -1,76 +1,42 @@
 import pandas as pd
 
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.children = []
+
 def read_parsing_table(csv_file):
-    """
-    Lee la tabla de análisis desde un archivo CSV y la convierte en un diccionario.
-    
-    Parámetros:
-        csv_file (str): Ruta al archivo CSV que contiene la tabla de análisis.
-        
-    Retorna:
-        dict: Tabla de análisis en el formato {no_terminal: {terminal: lista_producción}}
-    """
-    # Leer el archivo CSV
     df = pd.read_csv(csv_file)
-    
-    # Inicializar el diccionario de la tabla de análisis
     parsing_table = {}
-    
-    # Iterar sobre cada fila del DataFrame
     for _, row in df.iterrows():
         non_terminal = row['NonTerminal']
         terminal = row['Terminal']
         production = row['Production']
-        
-        # Inicializar el diccionario del no terminal si aún no existe
         if non_terminal not in parsing_table:
             parsing_table[non_terminal] = {}
-        
-        # Convertir la producción en una lista
-        if pd.isna(production) or production.strip() == "":
-            production_list = []  # Producción épsilon
-        else:
-            production_list = production.split()  # Separar símbolos por espacios
-        
-        # Agregar la regla a la tabla de análisis
+        production_list = [] if pd.isna(production) or production.strip() == "" else production.split()
         parsing_table[non_terminal][terminal] = production_list
-    
     return parsing_table
 
-def predictive_parser(input_tokens, csv_file="parsing_table.csv"):
-    """
-    Implementa un analizador predictivo usando una tabla de análisis leída desde un archivo CSV.
-    
-    Parámetros:
-        input_tokens (list): Lista de tokens de entrada a analizar.
-        csv_file (str): Ruta al archivo CSV que contiene la tabla de análisis.
-    """
-    # Leer la tabla de análisis desde el archivo CSV
+def predictive_parser(input_tokens, csv_file="producciones.csv"):
     parsing_table = read_parsing_table(csv_file)
-    
-    # Inicializar la pila y la entrada
-    stack = ['$', 'E']
-    input_tokens = input_tokens.copy()  # Evitar modificar la lista original
+    stack = [(TreeNode('$'), '$'), (TreeNode('E'), 'E')]
+    input_tokens = input_tokens.copy()
     input_tokens.append('$')
     pointer = 0
-    
-    # Imprimir encabezado del trazo del análisis
+    root = stack[-1][0]  # Raíz del árbol
+
     print(f"{'Pila':<20} {'Entrada':<20} {'Acción'}")
     print("-" * 60)
-    
+
     while stack:
-        top = stack.pop()
+        top_node, top = stack.pop()
         current_input = input_tokens[pointer]
-        
-        # Imprimir el estado actual
-        print(f"{' '.join(stack[::-1]):<20} {' '.join(input_tokens[pointer:]):<20}", end=" ")
-        
-        # Verificar aceptación
+        print(f"{' '.join(s for _, s in stack[::-1]):<20} {' '.join(input_tokens[pointer:]):<20}", end=" ")
+
         if top == current_input == '$':
             print("ACEPTAR")
             break
-        
-        # Manejar terminales
         elif top in ['int', '+', '*', '(', ')', '$']:
             if top == current_input:
                 print("terminal")
@@ -78,66 +44,81 @@ def predictive_parser(input_tokens, csv_file="parsing_table.csv"):
             else:
                 print("ERROR: desajuste de terminal")
                 break
-        
-        # Manejar no terminales
         elif top in parsing_table:
             rule = parsing_table[top].get(current_input)
             if rule is not None:
-                if rule:  # Producción no épsilon
-                    stack.extend(reversed(rule))
-                    print(f"{' '.join(rule)}")
-                else:  # Producción épsilon
-                    print("ε")
+                print(f"{' '.join(rule) if rule else 'ε'}")
+                for symbol in reversed(rule):
+                    child = TreeNode(symbol)
+                    top_node.children.append(child)
+                    stack.append((child, symbol))
             else:
                 print("ERROR: no se encontró regla")
                 break
         else:
             print(f"ERROR: símbolo desconocido {top}")
             break
+
+    return root
+
+def inorder_traversal(node):
+    if not node.children:
+        return [node.value]
+    mid = len(node.children) // 2
+    result = []
+    for i, child in enumerate(node.children):
+        if i == mid:
+            result.append(node.value)
+        result.extend(inorder_traversal(child))
+    if mid == 0:
+        result.insert(0, node.value)
+    return result
+
+def postorder_traversal(node):
+    result = []
+    for child in node.children:
+        result.extend(postorder_traversal(child))
+    result.append(node.value)
+    return result
+
+def guardar_recorridos(root, archivo="recorridos.csv"):
+    inorden = inorder_traversal(root)
+    postorden = postorder_traversal(root)
+    df = pd.DataFrame({"inorden": inorden, "postorden": postorden})
+    df.to_csv(archivo, index=False)
+    print(f"Recorridos guardados en: {archivo}")
+
 def procesar_tabla_analisis(archivo_entrada, archivo_salida):
-    # Leer el archivo CSV de entrada
     df = pd.read_csv(archivo_entrada)
-    
-    # Extraer la lista de terminales (primera fila, excluyendo "Non-Terminal")
     terminales = df.columns[1:].tolist()
-    
-    # Lista para almacenar las producciones resultantes
     producciones = []
-    
-    # Iterar sobre cada fila (no terminales)
     for _, fila in df.iterrows():
         no_terminal = fila['Non-Terminal']
-        
-        # Iterar sobre cada terminal
         for terminal in terminales:
             produccion = fila[terminal]
-            
-            # Saltar celdas vacías o NaN
             if pd.isna(produccion) or produccion == '':
                 continue
-                
-            # Reemplazar ε con cadena vacía
             if produccion == 'ε':
                 produccion = ''
-                
-            # Agregar a la lista de producciones
             producciones.append({
                 'NonTerminal': no_terminal,
                 'Terminal': terminal,
                 'Production': produccion
             })
-    
-    # Crear DataFrame con las producciones
     df_salida = pd.DataFrame(producciones)
-    
-    # Guardar en archivo CSV
     df_salida.to_csv(archivo_salida, index=False)
     print(f"Archivo generado exitosamente: {archivo_salida}")
 
-# Ejecutar el analizador con esta entrada
+def imprimir_arbol(node, nivel=0):
+    print("  " * nivel + f"- {node.value}")
+    for child in node.children:
+        imprimir_arbol(child, nivel + 1)
+
 if __name__ == "__main__":
     archivo_entrada = 'tabla.csv'
     archivo_salida = 'producciones.csv'
     procesar_tabla_analisis(archivo_entrada, archivo_salida)
-    input_string = ['int', '+', 'int']
-    predictive_parser(input_string, csv_file="producciones.csv")
+    input_string = ['int', '+', '+', 'int']
+    root = predictive_parser(input_string, csv_file=archivo_salida)
+    imprimir_arbol(root)
+    guardar_recorridos(root, archivo="recorridos.csv")
