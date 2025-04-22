@@ -37,7 +37,7 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
         if top == current_input == '$':
             print("ACEPTAR")
             break
-        elif top in ['int', '+', '*', '(', ')', '$','ε']:
+        elif top in ['int', '+', '*', '(', ')', '$', 'ε']:
             if top == current_input:
                 print("terminal")
                 pointer += 1
@@ -48,10 +48,13 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
             rule = parsing_table[top].get(current_input)
             if rule is not None:
                 print(f"{' '.join(rule) if rule else 'ε'}")
-                for symbol in reversed(rule):
-                    child = TreeNode(symbol)
-                    top_node.children.append(child)
-                    stack.append((child, symbol))
+                # Crear los nodos hijos primero
+                children_nodes = [TreeNode(symbol) for symbol in rule]
+
+                top_node.children.extend(children_nodes)
+
+                for child_node, symbol in zip(reversed(children_nodes), reversed(rule)):
+                    stack.append((child_node, symbol))
             else:
                 print("ERROR: no se encontró regla")
                 break
@@ -83,8 +86,7 @@ def procesar_tabla_analisis(archivo_entrada, archivo_salida):
     print(f"Archivo generado exitosamente: {archivo_salida}")
 
 def generar_arbol_graphviz(node, filename="arbol_sintactico"):
-    """Genera un archivo DOT para visualizar el árbol con Graphviz"""
-    
+
     # Contadores para nodos únicos
     node_counter = 0
     dot_lines = ["digraph G {"]
@@ -115,10 +117,13 @@ def generar_arbol_graphviz(node, filename="arbol_sintactico"):
         f.write("\n".join(dot_lines))
     
     print(f"Archivo DOT generado: {dot_filename}")
+    
 if __name__ == "__main__":
     archivo_entrada = 'tabla.csv'
     archivo_salida = 'producciones.csv'
     procesar_tabla_analisis(archivo_entrada, archivo_salida)
+    #input_string = ['(','(','int','*','int',')','+','int',')']
     input_string = ['int', '+', 'int']
     root = predictive_parser(input_string, csv_file=archivo_salida)
     generar_arbol_graphviz(root)
+    
