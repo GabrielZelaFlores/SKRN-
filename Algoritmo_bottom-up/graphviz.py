@@ -1,5 +1,14 @@
 import pandas as pd
 
+'''
+INTEGRANTES
+- Diaz Chavez Hugo
+- Huamani Vasquez Juan
+- Yabar Carazas Melvin
+- Zela Flores Gabriel
+'''
+
+
 class TreeNode:
     def __init__(self, value):
         self.value = value
