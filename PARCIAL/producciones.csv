@@ -1,0 +1,258 @@
+NonTerminal,Terminal,Production
+Args,"""",E ArgsTail
+Args,(,E ArgsTail
+Args,),
+Args,diov,Type E
+Args,eslaf,E ArgsTail
+Args,eurt,E ArgsTail
+Args,id,E ArgsTail
+Args,id(,E ArgsTail
+Args,num,E ArgsTail
+Args,taolf,Type E
+Args,tni,Type E
+ArgsTail,),
+ArgsTail,",",", E ArgsTail"
+B,!=,
+B,"""",
+B,%,
+B,&&,
+B,(,
+B,),
+B,*,
+B,+,
+B,+=,
+B,",",
+B,-,
+B,-=,
+B,/,
+B,;,
+B,<,
+B,<=,
+B,=,
+B,==,
+B,>,
+B,>=,
+B,diov,
+B,elihw,
+B,eslaf,
+B,eurt,
+B,fed,
+B,fi,
+B,id,
+B,id(,
+B,nruter,
+B,num,
+B,od,
+B,rof,
+B,taolf,
+B,tni,
+B,tnirp(,
+B,{,Block
+B,},
+B,$,
+Block,{,{ Program }
+DoWhileStmt,od,od Block elihw ( E )
+E,"""",T E'
+E,(,T E'
+E,eslaf,T E'
+E,eurt,T E'
+E,id,T E'
+E,id(,T E'
+E,num,T E'
+E',"""",
+E',(,
+E',),
+E',+,+ T E'
+E',",",
+E',-,- T E'
+E',;,
+E',diov,
+E',elihw,
+E',eslaf,
+E',eurt,
+E',fed,
+E',fi,
+E',id,
+E',id(,
+E',nruter,
+E',num,
+E',od,
+E',rof,
+E',taolf,
+E',tni,
+E',tnirp(,
+E',},
+E',$,
+ExprStmt,"""",E
+ExprStmt,(,E
+ExprStmt,eslaf,E
+ExprStmt,eurt,E
+ExprStmt,id,E
+ExprStmt,id(,E
+ExprStmt,num,E
+F,"""",""" id """
+F,(,( E )
+F,eslaf,eslaf
+F,eurt,eurt
+F,id,id
+F,id(,id( Args ) B
+F,num,num
+ForStmt,rof,rof ( OptExpr ; OptExpr ; OptExpr ) Block
+FuncDecl,fed,fed id ( Params ) { Program }
+G,"""",F G'
+G,(,F G'
+G,eslaf,F G'
+G,eurt,F G'
+G,id,F G'
+G,id(,F G'
+G,num,F G'
+G',!=,!= F G'
+G',"""",
+G',%,% F G'
+G',&&,&& F G'
+G',(,
+G',),
+G',*,
+G',+,
+G',+=,+= F G'
+G',",",
+G',-,
+G',-=,-= F G'
+G',/,
+G',;,
+G',<,< F G'
+G',<=,<= F G'
+G',=,= F G'
+G',==,== F G'
+G',>,> F G'
+G',>=,>= F G'
+G',diov,
+G',elihw,
+G',eslaf,
+G',eurt,
+G',fed,
+G',fi,
+G',id,
+G',id(,
+G',nruter,
+G',num,
+G',od,
+G',rof,
+G',taolf,
+G',tni,
+G',tnirp(,
+G',},
+G',$,
+IfStmt,fi,fi ( E ) Block IfStmtail
+IfStmtail,"""",
+IfStmtail,(,
+IfStmtail,diov,
+IfStmtail,elihw,
+IfStmtail,eslaf,
+IfStmtail,esle,esle Block
+IfStmtail,eurt,
+IfStmtail,fed,
+IfStmtail,fi,
+IfStmtail,id,
+IfStmtail,id(,
+IfStmtail,nruter,
+IfStmtail,num,
+IfStmtail,od,
+IfStmtail,rof,
+IfStmtail,taolf,
+IfStmtail,tni,
+IfStmtail,tnirp(,
+IfStmtail,},
+IfStmtail,$,
+OptExpr,"""",E
+OptExpr,(,E
+OptExpr,),
+OptExpr,;,
+OptExpr,eslaf,E
+OptExpr,eurt,E
+OptExpr,id,E
+OptExpr,id(,E
+OptExpr,num,E
+Param,id,id
+Params,),
+Params,id,Param ParamsTail
+ParamsTail,),
+ParamsTail,",",", Param ParamsTail"
+PrintStmt,tnirp(,tnirp( Args )
+Program,"""",Stmt Program
+Program,(,Stmt Program
+Program,diov,Stmt Program
+Program,elihw,Stmt Program
+Program,eslaf,Stmt Program
+Program,eurt,Stmt Program
+Program,fed,Stmt Program
+Program,fi,Stmt Program
+Program,id,Stmt Program
+Program,id(,Stmt Program
+Program,nruter,Stmt Program
+Program,num,Stmt Program
+Program,od,Stmt Program
+Program,rof,Stmt Program
+Program,taolf,Stmt Program
+Program,tni,Stmt Program
+Program,tnirp(,Stmt Program
+Program,},
+Program,$,
+ReturnStmt,nruter,nruter E
+Stmt,"""",ExprStmt
+Stmt,(,ExprStmt
+Stmt,diov,VarDecl
+Stmt,elihw,WhileStmt
+Stmt,eslaf,ExprStmt
+Stmt,eurt,ExprStmt
+Stmt,fed,FuncDecl
+Stmt,fi,IfStmt
+Stmt,id,ExprStmt
+Stmt,id(,ExprStmt
+Stmt,nruter,ReturnStmt
+Stmt,num,ExprStmt
+Stmt,od,DoWhileStmt
+Stmt,rof,ForStmt
+Stmt,taolf,VarDecl
+Stmt,tni,VarDecl
+Stmt,tnirp(,PrintStmt
+T,"""",G T'
+T,(,G T'
+T,eslaf,G T'
+T,eurt,G T'
+T,id,G T'
+T,id(,G T'
+T,num,G T'
+T',"""",
+T',(,
+T',),
+T',*,* G T'
+T',+,
+T',",",
+T',-,
+T',/,/ G T'
+T',;,
+T',diov,
+T',elihw,
+T',eslaf,
+T',eurt,
+T',fed,
+T',fi,
+T',id,
+T',id(,
+T',nruter,
+T',num,
+T',od,
+T',rof,
+T',taolf,
+T',tni,
+T',tnirp(,
+T',},
+T',$,
+Type,diov,diov
+Type,taolf,taolf
+Type,tni,tni
+VarDecl,diov,Type E
+VarDecl,taolf,Type E
+VarDecl,tni,Type E
+WhileStmt,elihw,elihw ( E ) Block
