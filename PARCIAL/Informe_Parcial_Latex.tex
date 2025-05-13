@@ -1,0 +1,173 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{listings}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{amsmath}
+\usepackage{fancyvrb}
+\usepackage{geometry}
+\geometry{a4paper, margin=2.5cm}
+
+\title{
+    \vspace*{3cm} % Espacio desde el borde superior
+    \textbf{\Huge Especificación Léxica del Lenguaje SKRN} \\[2cm]
+}
+
+\author{
+    \Large
+    Hugo Alonso Youzzueff Diaz Chavez\\[0.5em]
+    Juan José Huamaní Vásquez\\[0.5em]
+    Melvin Jarred Yabar Carazas\\[0.5em]
+    Gabriel Frank Krisna Zela Flores\\[2cm]
+    \textbf{Universidad La Salle}\\[0.5em]
+    \textbf{Escuela Profesional de Ingeniería de Software}\\[0.5em]
+    \textbf{Curso: Compiladores}\\[0.5em]
+    \textbf{Docente: Vicente Enrique Machaca Arceda}\\[3cm]
+}
+
+\date{\Large Compiladores - 13 de Mayo de 2025}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+
+\section*{1. Introducción}
+Este informe presenta el diseño y la implementación de un lenguaje de programación educativo inspirado en C, en el que se ha invertido el orden de las palabras reservadas para promover el entendimiento de los analizadores sintácticos LL(1). Se aborda el proceso completo, desde el análisis léxico hasta la generación de árboles sintácticos, con el objetivo de brindar una base sólida para estudiantes de compiladores.
+
+\section*{2. Especificación Léxica}
+
+\subsection*{Tokens y Expresiones Regulares}
+\begin{itemize}
+  \item \textbf{ID}: [a-zA-Z\_][a-zA-Z0-9\_]*
+  \item \textbf{INTEGER}: \textbackslash d+
+  \item \textbf{FLOATING}: \textbackslash d+\textbackslash.\textbackslash d+([eE][+-]?\textbackslash d+)?
+  \item \textbf{STRING}: \texttt{"}.*?\texttt{"}
+  \item \textbf{CHARACTER}: \texttt{'}.\texttt{'}
+  \item \textbf{Operadores}: =, +, -, *, /, %, ==, !=, <, >, <=, >=, ++, --, +=, -=, *=, /=, \&\&, ||, !
+  \item \textbf{Delimitadores}: (, ), \{, \}, [, ], ;, ,
+  \item \textbf{Palabras reservadas}: tni, taolf, diov, fi, esle, elihw, od, rof, nruter, tnirp, entre otras.
+\end{itemize}
+
+\section*{3. Gramática del Lenguaje (completa)}
+
+\begin{verbatim}
+Program    -> Stmt Program | ε
+Stmt       -> FuncDecl | ExprStmt | PrintStmt | ForStmt | IfStmt
+             | WhileStmt | DoWhileStmt | VarDecl | ReturnStmt
+Block       -> { Program }
+DoWhileStmt -> od Block elihw ( E )
+WhileStmt   -> elihw ( E ) Block
+ForStmt     -> rof ( OptExpr ; OptExpr ; OptExpr ) Block
+OptExpr     -> E | ε
+IfStmt      -> fi ( E ) Block IfStmtail
+IfStmtail   -> esle Block | ε
+FuncDecl    -> fed id ( Params ) { Program }
+Params      -> Param ParamsTail | ε
+ParamsTail  -> , Param ParamsTail | ε
+Param       -> id
+ExprStmt    -> E
+PrintStmt   -> tnirp( Args )
+Args        -> E ArgsTail | Type E | ε
+ArgsTail    -> , E ArgsTail | ε
+VarDecl     -> Type E
+Type        -> tni | taolf | diov
+ReturnStmt  -> nruter E
+E           -> T E'
+E'          -> + T E' | - T E' | ε
+T           -> G T'
+T'          -> * G T' | / G T' | ε
+G           -> F G'
+G'          -> >= F G' | % F G' | < F G' | <= F G' | > F G'
+             | = F G' | += F G' | -= F G' | == F G' | != F G' | && F G' | ε
+F           -> ( E ) | id | " id " | id( Args ) B | num | eurt | eslaf
+B           -> ε | Block
+\end{verbatim}
+
+\section*{Anexo: Fragmento de la Tabla LL(1)}
+
+A continuación, se muestra un extracto representativo de la tabla LL(1) generada automáticamente a partir de la gramática:
+
+\begin{table}[H]
+\centering
+\scriptsize
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{No Terminal} & \texttt{tni} & \texttt{id(} & \texttt{fed} & \texttt{diov} & \texttt{od} \\
+\hline
+Program       & Stmt Program & Stmt Program & Stmt Program & Stmt Program & Stmt Program \\
+Stmt          & VarDecl & ExprStmt & FuncDecl & VarDecl & DoWhileStmt \\
+FuncDecl      &          &          & fed id ( Params ) \{ Program \} & & \\
+DoWhileStmt   &          &          &          &          & od Block elihw ( E ) \\
+VarDecl       & Type E   &          &          & Type E   & \\
+\hline
+\end{tabular}
+\caption{Fragmento de la Tabla LL(1) para símbolos iniciales clave}
+\end{table}
+
+\section*{4. Implementación del Analizador Sintáctico}
+
+\subsection*{4.1 Análisis Léxico}
+El módulo \texttt{lexer.py} fue desarrollado usando \texttt{ply.lex}. Se encarga de procesar el archivo fuente \texttt{entrada\_lex.txt} y generar la secuencia de tokens.
+
+\subsection*{4.2 Tabla Sintáctica LL(1)}
+\texttt{tabla.py} genera la tabla \texttt{tabla.csv} a partir de una definición textual de la gramática.
+
+\subsection*{4.3 Análisis Sintáctico Predictivo}
+\texttt{parser.py} contiene la lógica del algoritmo LL(1), construye el árbol sintáctico y lo exporta en formato Graphviz:
+
+\begin{verbatim}
+input_tokens = ['tni', 'id(', ')', '{', 'tnirp(', 'id', ')', 'nruter', 'num', '}']
+root = predictive_parser(input_tokens, csv_file='producciones.csv')
+generar_arbol_graphviz(root)
+\end{verbatim}
+
+\section*{5. Ejemplos de Código}
+
+\subsection*{5.1 Ejemplo 1: Hola Mundo}
+\begin{verbatim}
+tni niam() {
+    tnirp("Hola, Mundo!")
+    nruter 0
+}
+\end{verbatim}
+
+\subsection*{5.2 Ejemplo 2: Bucles Anidados}
+\begin{verbatim}
+tni niam() {
+    tni i = 0
+    elihw (i < 5) {
+        tni j = 0
+        elihw (j < 5) {
+            tnirp(i, " ", j)
+            j = j + 1
+        }
+        i = i + 1
+    }
+    nruter 0
+}
+\end{verbatim}
+
+\subsection*{5.3 Ejemplo 3: Recursividad - Factorial}
+\begin{verbatim}
+diov factorial(tni n) {
+    fi (n == 0) {
+        nruter 1
+    }
+    nruter n * factorial(n - 1)
+}
+
+tni niam() {
+    tni resultado = factorial(5)
+    tnirp(resultado)
+    nruter 0
+}
+\end{verbatim}
+
+\section*{6. Conclusiones}
+Se logró implementar exitosamente un analizador sintáctico LL(1) completo, desde la etapa léxica hasta la generación de árboles, acompañado de visualización en Graphviz.
+
+\end{document}
