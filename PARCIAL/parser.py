@@ -89,7 +89,7 @@ def generar_arbol_graphviz(node, filename="arbol_sintactico"):
     node_counter = 0
     dot_lines = ["digraph G {", "  node [fontname=Arial];"]
 
-    # Lista básica de terminales que puedes adaptar a tus necesidades
+    # Lista de terminales
     terminales = {'!=','"','$','%','&&','(',')','*','+','+=',',','-','-=','/',';','<','<=','=','==','>','>=','diov','elihw','eslaf','esle','eurt','fed','fi','id','id(','nruter','num','od','rof(','taolf','tni','tnirp(','{','}'}
 
     def build_graph(node, parent_id=None):
