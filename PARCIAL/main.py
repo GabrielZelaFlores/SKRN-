@@ -16,6 +16,10 @@ from parser import (
 
 from lexer import tokenizar_frase
 
+from semantic import SymbolTable, semantic_analysis
+
+
+
 def main():
     # Tokens
     with open("entrada_lex.txt", "r", encoding="utf-8") as file:
@@ -49,6 +53,12 @@ def main():
 
     # Arbol
     generar_arbol_graphviz(root)
+    #print(root)
+
+    symbol_table = SymbolTable()
+    semantic_analysis(root, symbol_table)
+    symbol_table.print_table()
+
 
 if __name__ == "__main__":
     main()
