@@ -1,0 +1,16 @@
+tni a = 0
+tni a = 10
+
+diov factorial(tni n) {
+    fi (n == 0) {
+        nruter 1
+    }
+    nruter n * factorial(n - 1)
+}
+
+tni niam() {
+    tni resultado = factorial(5)
+    tni hola = a + y
+    tnirp(resultado)
+    nruter 0
+} 
