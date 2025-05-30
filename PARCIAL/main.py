@@ -14,9 +14,9 @@ from parser import (
     generar_arbol_graphviz
 )
 
-from lexer import tokenizar_frase
+from lexer import tokenizar_frase,tokenizar_frase_sem
 
-from semantic import SymbolTable, semantic_analysis
+from semantic import build_symbol_table,verificar_variables_usadas,check_duplicate_declarations
 
 
 
@@ -54,11 +54,22 @@ def main():
     # Arbol
     generar_arbol_graphviz(root)
     #print(root)
+    tokens_sem = tokenizar_frase_sem(code)
+    tabla = build_symbol_table(tokens_sem)
+    #print(tokens_sem)
+    print("\nTABLA DE SIMBOLOS")
+    for entry in tabla:
+        print(f"Nombre: {entry['name']:<20}, Tipo: {entry['type']:<20}, Ámbito: {entry['scope']:<20}")
 
-    symbol_table = SymbolTable()
-    semantic_analysis(root, symbol_table)
-    symbol_table.print_table()
+    errores = verificar_variables_usadas(tokens_sem, tabla)
 
+    print("\nERRORES SEMÁNTICOS:")
+    for e in errores:
+        print(e)
+
+    errores = check_duplicate_declarations(tabla)
+    for e in errores:
+        print(e)
 
 if __name__ == "__main__":
     main()
