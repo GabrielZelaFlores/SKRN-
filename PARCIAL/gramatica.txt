@@ -2,12 +2,12 @@ Program    -> Stmt Program
 Program    -> ε
 
 Stmt       -> FuncDecl
-Stmt       -> ExprStmt
-Stmt       -> PrintStmt
 Stmt       -> ForStmt
 Stmt       -> IfStmt
 Stmt       -> WhileStmt
 Stmt       -> DoWhileStmt
+Stmt       -> ExprStmt
+Stmt       -> PrintStmt
 Stmt       -> VarDecl
 Stmt       -> ReturnStmt
 
@@ -21,7 +21,7 @@ WhileStmt   -> elihw ( E ) Block
 ForStmt     -> rof ( OptExpr ; OptExpr ; OptExpr ) Block
 
 OptExpr     -> E
-OptExpr     -> ε
+OptExpr     -> ε 
 
 IfStmt      -> fi ( E ) Block IfStmtail
 IfStmtail   -> esle Block
@@ -48,6 +48,7 @@ ArgsTail   -> ε
 VarDecl    -> Type E 
 
 Type       -> tni
+Type       -> naim
 Type       -> taolf
 Type       -> diov
 
