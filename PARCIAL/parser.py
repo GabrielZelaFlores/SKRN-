@@ -1,9 +1,14 @@
 import pandas as pd
 
 class TreeNode:
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, name, value=None):
+        self.name = name  # Símbolo gramatical
+        self.value = value  # Valor del token (solo para terminales)
         self.children = []
+
+    def __str__(self):
+        return f"{self.name}:{self.value}" if self.value else self.name
+
 
 def read_parsing_table(csv_file):
     df = pd.read_csv(csv_file)
@@ -21,8 +26,11 @@ def read_parsing_table(csv_file):
 def predictive_parser(input_tokens, csv_file="producciones.csv"):
     parsing_table = read_parsing_table(csv_file)
     stack = [(TreeNode('$'), '$'), (TreeNode('Program'), 'Program')]
+    
+    # Agregamos símbolo fin de entrada
     input_tokens = input_tokens.copy()
-    input_tokens.append('$')
+    input_tokens.append(('$', '$'))  # ahora es una tupla
+
     pointer = 0
     root = stack[-1][0]  # Raíz del árbol
 
@@ -30,29 +38,30 @@ def predictive_parser(input_tokens, csv_file="producciones.csv"):
     print("-" * 150)
 
     while stack:
-        print(f"{' '.join(s for _, s in stack[::-1]):<80} {' '.join(input_tokens[pointer:]):<80}", end=" ")
+        print(f"{' '.join(s for _, s in stack[::-1]):<80} {' '.join(tok[0] for tok in input_tokens[pointer:]):<80}", end=" ")
         top_node, top = stack.pop()
-        current_input = input_tokens[pointer]
+        current_token_type, current_token_value = input_tokens[pointer]
 
-        if top == current_input == '$':
+        if top == current_token_type == '$':
             print("ACEPTAR")
             break
-        elif top in ['!=','"','$','%','&&','(',')','*','+','+=',',','-','-=','/',';','<','<=','=','==','>','>=','diov','elihw','eslaf','esle','eurt','fed','fi','id','id(','nruter','num','od','rof(','taolf','tni','tnirp(','{','}']:
-            if top == current_input:
+        elif top in ['!=','"','$','%','&&','(',')','*','+','+=',',','-','-=','/',';','<','<=','=','==','>','>=',
+                     'diov','elihw','eslaf','esle','eurt','fed','fi','id','id(','nruter','num','od','rof(','taolf',
+                     'tni','tnirp(','{','}']:
+            if top == current_token_type:
+                top_node.value = current_token_value  # ✅ Guardar el valor del token
                 print("terminal")
                 pointer += 1
             else:
                 print("ERROR: desajuste de terminal")
                 break
         elif top in parsing_table:
-            rule = parsing_table[top].get(current_input)
+            rule = parsing_table[top].get(current_token_type)
             if rule is not None:
                 print(f"{' '.join(rule) if rule else 'ε'}")
-                # Crear los nodos hijos primero
+                # Crear nodos hijos y agregarlos
                 children_nodes = [TreeNode(symbol) for symbol in rule]
-
                 top_node.children.extend(children_nodes)
-
                 for child_node, symbol in zip(reversed(children_nodes), reversed(rule)):
                     stack.append((child_node, symbol))
             else:
@@ -98,10 +107,10 @@ def generar_arbol_graphviz(node, filename="arbol_sintactico"):
         node_counter += 1
 
         # Estilo según si es terminal o no
-        if node.value in terminales:
+        if node.name in terminales:
             dot_lines.append(f'  node{current_id} [label="{node.value}", style=filled, fillcolor=lightblue, shape=box];')
         else:
-            dot_lines.append(f'  node{current_id} [label="{node.value}"];')
+            dot_lines.append(f'  node{current_id} [label="{node.name}"];')
 
         # Conexión con el padre
         if parent_id is not None:
