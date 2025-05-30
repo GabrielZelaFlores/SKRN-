@@ -1,114 +1,133 @@
-class SymbolTable:
-    def __init__(self):
-        self.table = []
-        self.scope_stack = []
+def extract_functions(tokens):
+    functions = []
+    i = 0
+    while i < len(tokens) - 3:
+        token_type, token_value = tokens[i]
+        next_token_type, next_token_value = tokens[i + 1]
+        third_token_type, third_token_value = tokens[i + 2]
 
-    def enter_scope(self, scope_name):
-        self.scope_stack.append(scope_name)
+        if token_type in ['tni', 'taolf', 'naim', 'diov'] and next_token_type == 'id' and third_token_type == '(':
+            functions.append({
+                'name': next_token_value,
+                'type': token_type,
+                'scope': 'global'
+            })
+        i += 1
+    return functions
 
-    def exit_scope(self):
-        if self.scope_stack:
-            self.scope_stack.pop()
+def extract_variables(tokens, function_names):
+    variables = []
+    i = 0
+    current_scope = 'global'
+    brace_depth = 0
 
-    def current_scope(self):
-        return '::'.join(self.scope_stack) if self.scope_stack else 'global'
+    while i < len(tokens):
+        token, value = tokens[i]
 
-    def declare(self, name, var_type):
-        self.table.append({
-            "name": name,
-            "type": var_type,
-            "scope": self.current_scope()
-        })
+        # Control de contexto de función
+        if token == '{':
+            brace_depth += 1
+        elif token == '}':
+            brace_depth -= 1
+            if brace_depth == 0:
+                current_scope = 'global'
 
-    def is_declared(self, name):
-        # Verifica si está declarado en algún scope visible
-        scopes = ['::'.join(self.scope_stack[:i+1]) for i in range(len(self.scope_stack))]
-        for scope in reversed(scopes):
-            for entry in self.table:
-                if entry['name'] == name and entry['scope'] == scope:
-                    return True
-        return False
+        # Detectar entrada a función
+        if token == 'id' and value in function_names:
+            if i + 1 < len(tokens) and tokens[i + 1][0] == '(':
+                current_scope = value
 
-    def print_table(self):
-        print("Tabla de símbolos:")
-        for entry in self.table:
-            print(entry)
+        # Saltar si es una declaración de función: tipo + id + (
+        if token in ['tni', 'taolf', 'naim', 'diov']:
+            if i + 2 < len(tokens) and tokens[i + 1][0] == 'id' and tokens[i + 2][0] == '(':
+                i += 1  # saltar este id
+                continue
 
-def semantic_analysis(node, symbol_table):
-    if node is None:
-        return
+            # Si no es una función, considerar como variable
+            if i + 1 < len(tokens) and tokens[i + 1][0] == 'id':
+                var_type = token
+                var_name = tokens[i + 1][1]
+                variables.append({
+                    'name': var_name,
+                    'type': var_type,
+                    'scope': current_scope
+                })
+        i += 1
+    return variables
 
-    # Entrar a nuevo ámbito si es un bloque o función
-    if node.value in ('Block', 'Program'):
-        symbol_table.enter_scope(node.value)
-    
-    # Función: fed id ( Params ) { Program }
-    if node.value == 'FuncDecl':
-        func_name = None
-        params = []
+def build_symbol_table(tokens):
+    functions = extract_functions(tokens)
+    function_names = [f['name'] for f in functions]
+    variables = extract_variables(tokens, function_names)
+    return functions + variables
 
-        for child in node.children:
-            if child.value == 'id':
-                func_name = child.value  # Podrías usar child.children[0].value si es más profundo
-            elif child.value == 'Params':
-                params = collect_params(child)
+def verificar_variables_usadas(tokens, tabla_simbolos):
+    declaradas = {'global': set()}
+    for entrada in tabla_simbolos:
+        ambito = entrada['scope']
+        declaradas.setdefault(ambito, set()).add(entrada['name'])
 
-        if func_name:
-            symbol_table.declare(func_name, 'func')
-            symbol_table.enter_scope(func_name)
-            for param in params:
-                symbol_table.declare(param, 'param')
+    errores = []
+    scope_stack = ['global']
+    pending_func = None
+    i = 0
 
-    # Variable: VarDecl -> Type E
-    if node.value == 'VarDecl':
-        var_type = None
-        var_name = None
-        for child in node.children:
-            if child.value == 'Type':
-                var_type = child.children[0].value  # Ej: tni
-            elif child.value == 'E':
-                var_name = find_identifier(child)
-        if var_name and var_type:
-            symbol_table.declare(var_name, var_type)
+    while i < len(tokens):
+        token, valor = tokens[i]
 
-    # Uso de variables: cuando hay un 'id' que no forma parte de declaración o función
-    if node.value == 'id':
-        if not symbol_table.is_declared(node.value):
-            print(f"ERROR SEMÁNTICO: variable '{node.value}' no declarada en ámbito '{symbol_table.current_scope()}'")
+        # Detectar definición de función: tipo seguido de id y paréntesis (
+        if token in ['diov', 'tni', 'taolf', 'naim']:
+            if i + 2 < len(tokens):
+                sig1, val1 = tokens[i + 1]
+                sig2, val2 = tokens[i + 2]
+                if sig1 == 'id' and sig2 == '(':
+                    pending_func = val1  # nombre de la función
 
-    # Recorremos hijos
-    for child in node.children:
-        semantic_analysis(child, symbol_table)
+        # Abrir un nuevo ámbito con '{'
+        if token == '{':
+            if pending_func:
+                scope_stack.append(pending_func)
+                pending_func = None
+            else:
+                scope_stack.append(scope_stack[-1])  # mismo ámbito (bloque anidado)
 
-    # Salir de ámbitos
-    if node.value == 'FuncDecl':
-        symbol_table.exit_scope()
-    if node.value in ('Block', 'Program'):
-        symbol_table.exit_scope()
+        # Cerrar ámbito con '}'
+        elif token == '}':
+            if len(scope_stack) > 1:
+                scope_stack.pop()
 
-def find_identifier(node):
-    """Encuentra el primer 'id' válido dentro de una expresión o nodo E, F, etc."""
-    if node.value == 'id':
-        return node.value
-    for child in node.children:
-        result = find_identifier(child)
-        if result:
-            return result
-    return None
+        # Verificar uso de variable no declarada
+        # Verificar uso de variable no declarada o función no existente
+        elif token == 'id':
+            # ¿Está llamando a una función?
+            if i + 1 < len(tokens) and tokens[i + 1][0] == '(':
+                nombre_funcion = valor
+                # Buscar en tabla si está definida como función
+                funciones_definidas = {
+                    entrada['name'] for entrada in tabla_simbolos if entrada['scope'] == 'global'
+                }
+                if nombre_funcion not in funciones_definidas:
+                    errores.append(f"Error: función '{nombre_funcion}' llamada sin definir en ámbito 'global'")
+            else:
+                es_declaracion = (
+                    i > 0 and tokens[i - 1][0] in ['tni', 'taolf', 'naim', 'diov']
+                )
+                if not es_declaracion:
+                    var = valor
+                    ambito_actual = scope_stack[-1]
+                    if var not in declaradas.get(ambito_actual, set()) and var not in declaradas.get('global', set()):
+                        errores.append(f"Error: variable '{var}' usada sin declarar en ámbito '{ambito_actual}'")
 
-def collect_params(node):
-    """Extrae todos los parámetros (id) desde Params -> Param ParamsTail"""
-    params = []
+        i += 1
 
-    def collect(n):
-        if n.value == 'Param':
-            for child in n.children:
-                if child.value == 'id':
-                    params.append(child.value)
-        for child in n.children:
-            collect(child)
-
-    collect(node)
-    return params
-
-
+    return errores
+def check_duplicate_declarations(symbol_table):
+    errores = []
+    seen = set()
+    for entry in symbol_table:
+        key = (entry['name'], entry['scope'])
+        if key in seen:
+            errores.append(f"Error: variable '{entry['name']}' redeclarada en ámbito '{entry['scope']}'")
+        else:
+            seen.add(key)
+    return errores
