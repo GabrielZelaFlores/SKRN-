@@ -160,7 +160,7 @@ def tokenizar_frase(frase):
     # Eliminar comentarios de línea //
     frase = re.sub(r'//.*', '', frase)
 
-    # Operadores compuestos (orden importa), cadenas, caracteres, palabras, símbolos
+    # Patrón
     patron = r"""
         \"[^"\n]*\"         |   # strings dobles
         \'[^'\n]*\'         |   # caracteres o strings simples
@@ -171,41 +171,102 @@ def tokenizar_frase(frase):
         ->|\.               |   # acceso a puntero o miembro
         [\(\){}\[\];,:]     |   # paréntesis, llaves, corchetes, etc.
         [<>!=+\-*/%]        |   # operadores simples
-        \w+\(               |   # llamadas a funciones (nombre seguida de paréntesis)
+        \w+\(               |   # nombre de función + paréntesis
         \w+                 |   # palabras
-        ε                   |   # símbolo epsilon explícito
+        ε                   |   # epsilon
         .                       # cualquier otro carácter
     """
 
     tokens = re.findall(patron, frase, flags=re.VERBOSE)
 
-    tokens_modificados = []
+    resultado = []
     for tok in tokens:
         tok = tok.strip()
         if not tok:
             continue
         if tok == 'ε':
-            tokens_modificados.append('ε')
+            resultado.append(('ε', 'ε'))
         elif tok.startswith('"') or tok.startswith("'"):
-            tokens_modificados.append("id")
+            resultado.append(('id', tok))  # o puedes usar otro tipo: string o char
         elif tok.endswith('(') and re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\($', tok):
             nombre_funcion = tok[:-1]
             if nombre_funcion in reserved:
-                tokens_modificados.append(nombre_funcion + '(')
+                resultado.append((nombre_funcion + '(', tok))
             else:
-                tokens_modificados.append("id(")
+                resultado.append(('id(', tok))
         elif tok.isdigit():
-            tokens_modificados.append("num")
+            resultado.append(('num', tok))
         elif re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', tok):
             if tok in reserved:
-                tokens_modificados.append(tok)
+                resultado.append((tok, tok))
             else:
-                tokens_modificados.append("id")
+                resultado.append(('id', tok))
         else:
-            tokens_modificados.append(tok)
+            resultado.append((tok, tok))
 
-    return tokens_modificados
+    return resultado
 
-print("\nTokens por tokenizar_frase:")
+'''print("\nTokens por tokenizar_frase:")
 tokens_rapidos = tokenizar_frase(code)
-print(tokens_rapidos)
+print(tokens_rapidos)'''
+
+
+import re
+
+def tokenizar_frase_sem(frase):
+    # Reemplazar '' por ε
+    frase = frase.replace("''", 'ε')
+
+    # Eliminar comentarios multilínea /* ... */
+    frase = re.sub(r'/\*.*?\*/', '', frase, flags=re.DOTALL)
+
+    # Eliminar comentarios de línea //
+    frase = re.sub(r'//.*', '', frase)
+
+    # Patrón
+    patron = r"""
+        \"[^"\n]*\"         |   # strings dobles
+        \'[^'\n]*\'         |   # caracteres o strings simples
+        \+\+|--             |   # incrementos / decrementos
+        ==|!=|<=|>=         |   # comparaciones dobles
+        \+=|-=|\*=|/=       |   # asignaciones compuestas
+        &&|\|\|             |   # operadores lógicos dobles
+        ->|\.               |   # acceso a puntero o miembro
+        [\(\){}\[\];,:]     |   # paréntesis, llaves, corchetes, etc.
+        [<>!=+\-*/%]        |   # operadores simples
+        \w+\(               |   # nombre de función + paréntesis
+        \w+                 |   # palabras
+        ε                   |   # epsilon
+        .                       # cualquier otro carácter
+    """
+
+    tokens = re.findall(patron, frase, flags=re.VERBOSE)
+
+    resultado = []
+    for tok in tokens:
+        tok = tok.strip()
+        if not tok:
+            continue
+        if tok == 'ε':
+            resultado.append(('ε', 'ε'))
+        elif tok.startswith('"') or tok.startswith("'"):
+            resultado.append(('id', tok))  # o puedes usar otro tipo: string o char
+        elif tok.endswith('(') and re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\($', tok):
+            nombre_funcion = tok[:-1]
+            if nombre_funcion in reserved:
+                resultado.append((nombre_funcion, nombre_funcion))
+                resultado.append(('(', '('))
+            else:
+                resultado.append(('id', nombre_funcion))
+                resultado.append(('(', '('))
+        elif tok.isdigit():
+            resultado.append(('num', tok))
+        elif re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', tok):
+            if tok in reserved:
+                resultado.append((tok, tok))
+            else:
+                resultado.append(('id', tok))
+        else:
+            resultado.append((tok, tok))
+
+    return resultado
