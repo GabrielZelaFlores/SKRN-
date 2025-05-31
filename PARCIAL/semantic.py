@@ -127,7 +127,24 @@ def check_duplicate_declarations(symbol_table):
     for entry in symbol_table:
         key = (entry['name'], entry['scope'])
         if key in seen:
-            errores.append(f"Error: variable '{entry['name']}' redeclarada en ámbito '{entry['scope']}'")
+            errores.append(f"Error: '{entry['name']}' redeclarada en ámbito '{entry['scope']}'")
         else:
             seen.add(key)
     return errores
+
+def limpiar_tabla_simbolos(tabla_simbolos, eliminar_locales=False):
+    tabla_filtrada = []
+    vistos = set()
+
+    for entrada in tabla_simbolos:
+        clave = (entrada['name'], entrada['scope'])
+
+        if clave not in vistos:
+            if eliminar_locales and entrada['scope'] != 'global':
+                # Saltar si se pide eliminar locales
+                continue
+            tabla_filtrada.append(entrada)
+            vistos.add(clave)
+
+    return tabla_filtrada
+
