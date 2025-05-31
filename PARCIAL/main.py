@@ -16,7 +16,12 @@ from parser import (
 
 from lexer import tokenizar_frase,tokenizar_frase_sem
 
-from semantic import build_symbol_table,verificar_variables_usadas,check_duplicate_declarations
+from semantic import (
+    build_symbol_table,
+    verificar_variables_usadas,
+    check_duplicate_declarations,
+    limpiar_tabla_simbolos
+)
 
 
 
@@ -57,7 +62,7 @@ def main():
     tokens_sem = tokenizar_frase_sem(code)
     tabla = build_symbol_table(tokens_sem)
     #print(tokens_sem)
-    print("\nTABLA DE SIMBOLOS")
+    print("\nTABLA DE TODO LOS SIMBOLOS")
     for entry in tabla:
         print(f"Nombre: {entry['name']:<20}, Tipo: {entry['type']:<20}, Ámbito: {entry['scope']:<20}")
 
@@ -70,6 +75,11 @@ def main():
     errores = check_duplicate_declarations(tabla)
     for e in errores:
         print(e)
+    tabla = limpiar_tabla_simbolos(tabla,eliminar_locales=True)
+    print("\nTABLA DE SIMBOLOS DEPURADA")
+    for entry in tabla:
+        print(f"Nombre: {entry['name']:<20}, Tipo: {entry['type']:<20}, Ámbito: {entry['scope']:<20}")
+
 
 if __name__ == "__main__":
     main()
