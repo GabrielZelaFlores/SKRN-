@@ -16,6 +16,7 @@ tokens = [
 
 # Palabras reservadas (reversed)
 reserved = {
+    'gnirts': 'type_string',
     'tni': 'type_int',
     'tnirp': 'PRINT',
     'taolf': 'type_float',
@@ -160,7 +161,6 @@ def tokenizar_frase(frase):
     # Eliminar comentarios de línea //
     frase = re.sub(r'//.*', '', frase)
 
-    # Patrón
     patron = r"""
         \"[^"\n]*\"         |   # strings dobles
         \'[^'\n]*\'         |   # caracteres o strings simples
@@ -168,15 +168,16 @@ def tokenizar_frase(frase):
         ==|!=|<=|>=         |   # comparaciones dobles
         \+=|-=|\*=|/=       |   # asignaciones compuestas
         &&|\|\|             |   # operadores lógicos dobles
-        ->|\.               |   # acceso a puntero o miembro
-        [\(\){}\[\];,:]     |   # paréntesis, llaves, corchetes, etc.
-        [<>!=+\-*/%]        |   # operadores simples
+        \d+\.\d+            |   #  flotantes (antes del punto suelto)
+        \d+                 |   # enteros
         \w+\(               |   # nombre de función + paréntesis
+        ->|\.               |   # acceso a puntero o miembro
+        [\(\){}\[\];,:]     |   # símbolos especiales
+        [<>!=+\-*/%]        |   # operadores simples
         \w+                 |   # palabras
         ε                   |   # epsilon
         .                       # cualquier otro carácter
     """
-
     tokens = re.findall(patron, frase, flags=re.VERBOSE)
 
     resultado = []
@@ -186,6 +187,8 @@ def tokenizar_frase(frase):
             continue
         if tok == 'ε':
             resultado.append(('ε', 'ε'))
+        elif tok.startswith('eurt') or tok.startswith("eslaf"):
+            resultado.append((tok, tok)) 
         elif tok.startswith('"') or tok.startswith("'"):
             resultado.append(('id', tok))  # o puedes usar otro tipo: string o char
         elif tok.endswith('(') and re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\($', tok):
@@ -194,6 +197,8 @@ def tokenizar_frase(frase):
                 resultado.append((nombre_funcion + '(', tok))
             else:
                 resultado.append(('id(', tok))
+        elif re.match(r'^\d+\.\d+$', tok):  
+            resultado.append(('num', tok))  # sigue siendo 'num', pero con . lo interpretamos como float más adelante
         elif tok.isdigit():
             resultado.append(('num', tok))
         elif re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', tok):
@@ -214,16 +219,10 @@ print(tokens_rapidos)'''
 import re
 
 def tokenizar_frase_sem(frase):
-    # Reemplazar '' por ε
     frase = frase.replace("''", 'ε')
+    frase = re.sub(r'/\*.*?\*/', '', frase, flags=re.DOTALL)  # comentarios /* ... */
+    frase = re.sub(r'//.*', '', frase)  # comentarios //
 
-    # Eliminar comentarios multilínea /* ... */
-    frase = re.sub(r'/\*.*?\*/', '', frase, flags=re.DOTALL)
-
-    # Eliminar comentarios de línea //
-    frase = re.sub(r'//.*', '', frase)
-
-    # Patrón
     patron = r"""
         \"[^"\n]*\"         |   # strings dobles
         \'[^'\n]*\'         |   # caracteres o strings simples
@@ -231,10 +230,12 @@ def tokenizar_frase_sem(frase):
         ==|!=|<=|>=         |   # comparaciones dobles
         \+=|-=|\*=|/=       |   # asignaciones compuestas
         &&|\|\|             |   # operadores lógicos dobles
-        ->|\.               |   # acceso a puntero o miembro
-        [\(\){}\[\];,:]     |   # paréntesis, llaves, corchetes, etc.
-        [<>!=+\-*/%]        |   # operadores simples
+        \d+\.\d+            |   #  flotantes (antes del punto suelto)
+        \d+                 |   # enteros
         \w+\(               |   # nombre de función + paréntesis
+        ->|\.               |   # acceso a puntero o miembro
+        [\(\){}\[\];,:]     |   # símbolos especiales
+        [<>!=+\-*/%]        |   # operadores simples
         \w+                 |   # palabras
         ε                   |   # epsilon
         .                       # cualquier otro carácter
@@ -249,8 +250,10 @@ def tokenizar_frase_sem(frase):
             continue
         if tok == 'ε':
             resultado.append(('ε', 'ε'))
+        elif tok in ['eurt', 'eslaf']:
+            resultado.append((tok, tok))
         elif tok.startswith('"') or tok.startswith("'"):
-            resultado.append(('id', tok))  # o puedes usar otro tipo: string o char
+            resultado.append(('string', tok))
         elif tok.endswith('(') and re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*\($', tok):
             nombre_funcion = tok[:-1]
             if nombre_funcion in reserved:
@@ -259,8 +262,10 @@ def tokenizar_frase_sem(frase):
             else:
                 resultado.append(('id', nombre_funcion))
                 resultado.append(('(', '('))
+        elif re.match(r'^\d+\.\d+$', tok):  
+            resultado.append(('num', tok))  # float
         elif tok.isdigit():
-            resultado.append(('num', tok))
+            resultado.append(('num', tok))  # int
         elif re.match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', tok):
             if tok in reserved:
                 resultado.append((tok, tok))
