@@ -51,6 +51,9 @@ Type       -> tni
 Type       -> naim
 Type       -> taolf
 Type       -> diov
+Type       -> gnirts
+Type       -> loob
+
 
 ReturnStmt -> nruter E
 
@@ -80,7 +83,7 @@ G'         -> ε
 
 F          -> ( E )
 F          -> id
-F          -> " id "
+F          -> string
 F          -> id( Args ) B
 B          -> ε
 B          -> Block
