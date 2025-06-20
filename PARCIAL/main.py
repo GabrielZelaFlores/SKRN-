@@ -20,7 +20,8 @@ from semantic import (
     build_symbol_table,
     verificar_variables_usadas,
     check_duplicate_declarations,
-    limpiar_tabla_simbolos
+    limpiar_tabla_simbolos,
+    verificar_tipos_expresiones
 )
 
 
@@ -55,10 +56,8 @@ def main():
     # Parser
     procesar_tabla_analisis("tabla.csv", "producciones.csv")
     root = predictive_parser(tokens_rapidos, csv_file="producciones.csv")
-
     # Arbol
     generar_arbol_graphviz(root)
-    #print(root)
     tokens_sem = tokenizar_frase_sem(code)
     tabla = build_symbol_table(tokens_sem)
     #print(tokens_sem)
@@ -80,6 +79,11 @@ def main():
     for entry in tabla:
         print(f"Nombre: {entry['name']:<20}, Tipo: {entry['type']:<20}, Ámbito: {entry['scope']:<20}")
 
+    errores_tipo = verificar_tipos_expresiones(tokens_sem, tabla)
+    print("\nERRORES DE TIPO")
+    for e in errores_tipo:
+        print(e)
+  
 
 if __name__ == "__main__":
     main()
